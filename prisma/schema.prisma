@@ -6,3 +6,220 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AddressType {
+  CORRESPONDENCE
+  PERMANENT
+}
+
+enum ExperienceType {
+  TEACHING
+  INDUSTRIAL
+  RESEARCH
+  ADMINISTRATIVE
+}
+
+enum PublicationCategory {
+  JOURNAL
+  CONFERENCE
+  BOOK
+  BOOK_CHAPTER
+}
+
+enum PublicationIndexing {
+  SCI
+  SCOPUS
+  NONE
+}
+
+enum CourseLevel {
+  UG
+  PG
+  PHD
+}
+
+enum UserRole {
+  ADMIN
+  FACULTY
+}
+
+enum AccountStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  email         String        @unique
+  passwordHash  String
+  role          UserRole
+  status        AccountStatus @default(PENDING)
+
+  createdAt     DateTime      @default(now())
+  approvedAt    DateTime?
+  approvedById  Int?
+
+  approvedBy    User?         @relation("AdminApproval", fields: [approvedById], references: [id])
+  approvals     User[]        @relation("AdminApproval")
+
+  faculty       Faculty?      // only if role = FACULTY
+}
+
+model Faculty {
+  id            Int       @id @default(autoincrement())
+  applicationNo String    @unique
+  name          String
+  dob           DateTime
+  gender        Gender
+  nationality   String
+  category      String
+  mobile        String
+  orcidId       String?   @unique
+
+  userId        Int       @unique
+  user          User      @relation(fields: [userId], references: [id])
+
+  departmentId  Int
+  department    Department @relation(fields: [departmentId], references: [id])
+
+  createdAt     DateTime  @default(now())
+
+  addresses     Address[]
+  employments   Employment[]
+  degrees       Degree[]
+  experiences   Experience[]
+  coursesTaught CourseTaught[]
+  laboratories  Laboratory[]
+  publications  Publication[]
+  theses        ThesisSupervision[]
+  dissertations DissertationSupervision[]
+}
+
+model Department {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  faculty  Faculty[]
+}
+
+model Address {
+  id        Int         @id @default(autoincrement())
+  type      AddressType
+  line1     String
+  line2     String?
+  line3     String?
+  district  String
+  state     String
+  country   String
+  pin       String
+
+  facultyId Int
+  faculty   Faculty @relation(fields: [facultyId], references: [id])
+}
+
+model Employment {
+  id            Int      @id @default(autoincrement())
+  organization  String
+  designation   String
+  natureOfWork  String
+  payLevel      String?
+  organizationType String
+  startDate     DateTime
+  endDate       DateTime?
+
+  facultyId     Int
+  faculty       Faculty @relation(fields: [facultyId], references: [id])
+}
+
+model Degree {
+  id            Int      @id @default(autoincrement())
+  degreeName    String
+  specialization String
+  institute     String
+  yearOfPassing Int
+  score         Float?
+  scoreType     String?  // CGPA / Percentage
+  division      String?
+
+  facultyId     Int
+  faculty       Faculty @relation(fields: [facultyId], references: [id])
+}
+
+model Experience {
+  id            Int             @id @default(autoincrement())
+  type          ExperienceType
+  organization  String
+  designation   String
+  natureOfWork  String
+  payScale      String?
+  startDate     DateTime
+  endDate       DateTime?
+
+  facultyId     Int
+  faculty       Faculty @relation(fields: [facultyId], references: [id])
+}
+
+model CourseTaught {
+  id        Int        @id @default(autoincrement())
+  title     String
+  level     CourseLevel
+  branch    String
+  times     Int
+
+  facultyId Int
+  faculty   Faculty @relation(fields: [facultyId], references: [id])
+}
+
+model Laboratory {
+  id        Int        @id @default(autoincrement())
+  name      String
+  level     CourseLevel
+  branch    String
+
+  facultyId Int
+  faculty   Faculty @relation(fields: [facultyId], references: [id])
+}
+
+model Publication {
+  id          Int                 @id @default(autoincrement())
+  title       String
+  category    PublicationCategory
+  publisher   String
+  isbn        String?
+  year        Int
+  indexing    PublicationIndexing
+  edition     String?
+
+  facultyId   Int
+  faculty     Faculty @relation(fields: [facultyId], references: [id])
+}
+
+model ThesisSupervision {
+  id          Int      @id @default(autoincrement())
+  title       String
+  researchArea String
+  year        Int
+  status      String  // Completed / Ongoing
+  role        String  // Supervisor / Co-supervisor
+
+  facultyId   Int
+  faculty     Faculty @relation(fields: [facultyId], references: [id])
+}
+
+model DissertationSupervision {
+  id            Int      @id @default(autoincrement())
+  title         String
+  specialization String
+  year          Int
+  role          String
+
+  facultyId     Int
+  faculty       Faculty @relation(fields: [facultyId], references: [id])
+}
