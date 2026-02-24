@@ -39,13 +39,12 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Faculty" (
     "id" SERIAL NOT NULL,
-    "applicationNo" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "dob" TIMESTAMP(3) NOT NULL,
-    "gender" "Gender" NOT NULL,
-    "nationality" TEXT NOT NULL,
-    "category" TEXT NOT NULL,
-    "mobile" TEXT NOT NULL,
+    "dob" TIMESTAMP(3),
+    "gender" "Gender",
+    "nationality" TEXT,
+    "category" TEXT,
+    "mobile" TEXT,
     "orcidId" TEXT,
     "userId" INTEGER NOT NULL,
     "departmentId" INTEGER NOT NULL,
@@ -188,9 +187,6 @@ CREATE TABLE "DissertationSupervision" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Faculty_applicationNo_key" ON "Faculty"("applicationNo");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Faculty_orcidId_key" ON "Faculty"("orcidId");
