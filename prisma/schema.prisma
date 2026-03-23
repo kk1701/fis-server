@@ -34,7 +34,7 @@ model Faculty {
   departmentId  Int
   createdAt     DateTime                  @default(now())
   addresses     Address[]
-  coursesTaught CourseTaught[]
+  coursesTaught Courses[]
   degrees       Degree[]
   dissertations DissertationSupervision[]
   employments   Employment[]
@@ -44,12 +44,20 @@ model Faculty {
   laboratories  Laboratory[]
   publications  Publication[]
   theses        ThesisSupervision[]
+  designation          String?
+  specialization       String[]
+  joiningDate          DateTime?
+  highestQualification String?
+  experienceYears      Int?
+  photoUrl             String?
 }
 
 model Department {
   id      Int       @id @default(autoincrement())
   name    String    @unique
   faculty Faculty[]
+  courses Courses[]
+  courseCatalog  CourseCatalog[]
 }
 
 model Address {
@@ -64,6 +72,8 @@ model Address {
   pin       String
   facultyId Int
   faculty   Faculty     @relation(fields: [facultyId], references: [id])
+
+  @@unique([facultyId, type])
 }
 
 model Employment {
@@ -105,14 +115,31 @@ model Experience {
   faculty      Faculty        @relation(fields: [facultyId], references: [id])
 }
 
-model CourseTaught {
-  id        Int         @id @default(autoincrement())
-  title     String
-  level     CourseLevel
-  branch    String
-  times     Int
-  facultyId Int
-  faculty   Faculty     @relation(fields: [facultyId], references: [id])
+model CourseCatalog {
+  id           Int         @id @default(autoincrement())
+  name         String
+  code         String      @unique
+  departmentId Int
+  level        CourseLevel
+  credits      Int?
+  department   Department  @relation(fields: [departmentId], references: [id])
+  coursesTaught Courses[]
+}
+
+model Courses {
+  id              Int          @id @default(autoincrement())
+  catalogCourseId Int
+  semester        String
+  academicYear    String
+  role            String 
+  hoursPerWeek    Int?
+  mode            String? 
+  notes           String?
+  facultyId       Int
+  departmentId    Int
+  faculty         Faculty      @relation(fields: [facultyId], references: [id])
+  department      Department   @relation(fields: [departmentId], references: [id])
+  catalogCourse   CourseCatalog @relation(fields: [catalogCourseId], references: [id])
 }
 
 model Laboratory {
@@ -134,6 +161,10 @@ model Publication {
   indexing  PublicationIndexing
   edition   String?
   facultyId Int
+  authors  String[]
+  doi      String?
+  url      String?
+  citation String?
   faculty   Faculty             @relation(fields: [facultyId], references: [id])
 }
 
