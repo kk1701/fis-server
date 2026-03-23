@@ -15,6 +15,7 @@ model User {
   status       AccountStatus @default(PENDING)
   createdAt    DateTime      @default(now())
   approvedAt   DateTime?
+  deletedAt DateTime?
   approvedById Int?
   faculty      Faculty?
   approvedBy   User?         @relation("AdminApproval", fields: [approvedById], references: [id])
