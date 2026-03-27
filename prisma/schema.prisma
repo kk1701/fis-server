@@ -56,6 +56,7 @@ model Faculty {
 model Department {
   id      Int       @id @default(autoincrement())
   name    String    @unique
+  code    String    @unique  
   faculty Faculty[]
   courses Courses[]
   courseCatalog  CourseCatalog[]
