@@ -169,6 +169,8 @@ model Publication {
   doi      String?
   url      String?
   citation String?
+  venue    String?
+  pages    String?
   faculty   Faculty             @relation(fields: [facultyId], references: [id])
 }
 
