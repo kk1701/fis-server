@@ -7,9 +7,10 @@ import { FacultyProfileModule } from './faculty-profile/faculty-profile.module';
 import { UsersModule } from './users/user.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { CoursesModule } from './courses/courses.module';
+import { FacultyCoursesModule } from './faculty-courses/faculty-courses.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, FacultyProfileModule, UsersModule, DepartmentsModule, CoursesModule],
+  imports: [ConfigModule.forRoot(), AuthModule, FacultyProfileModule, UsersModule, DepartmentsModule, CoursesModule, FacultyCoursesModule],
   controllers: [AppController],
   providers: [AppService],
 })

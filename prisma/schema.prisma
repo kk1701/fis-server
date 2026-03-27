@@ -139,6 +139,7 @@ model Courses {
   notes           String?
   facultyId       Int
   departmentId    Int
+  createdAt       DateTime     @default(now())
   faculty         Faculty      @relation(fields: [facultyId], references: [id])
   department      Department   @relation(fields: [departmentId], references: [id])
   catalogCourse   CourseCatalog @relation(fields: [catalogCourseId], references: [id])
