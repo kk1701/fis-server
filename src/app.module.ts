@@ -10,9 +10,10 @@ import { CoursesModule } from './courses/courses.module';
 import { FacultyCoursesModule } from './faculty-courses/faculty-courses.module';
 import { FacultyExperiencesModule } from './faculty-experiences/faculty-experiences.module';
 import { FacultyPublicationsModule } from './faculty-publications/faculty-publications.module';
+import { ApprovalsModule } from './approvals/approvals.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, FacultyProfileModule, UsersModule, DepartmentsModule, CoursesModule, FacultyCoursesModule, FacultyExperiencesModule, FacultyPublicationsModule],
+  imports: [ConfigModule.forRoot(), AuthModule, FacultyProfileModule, UsersModule, DepartmentsModule, CoursesModule, FacultyCoursesModule, FacultyExperiencesModule, FacultyPublicationsModule, ApprovalsModule],
   controllers: [AppController],
   providers: [AppService],
 })
