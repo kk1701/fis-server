@@ -114,6 +114,7 @@ model Experience {
   startDate    DateTime
   endDate      DateTime?
   facultyId    Int
+  location     String?
   faculty      Faculty        @relation(fields: [facultyId], references: [id])
 }
 
