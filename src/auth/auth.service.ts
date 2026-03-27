@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -13,18 +17,45 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    const existing = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
     if (existing) {
       throw new BadRequestException('Email already in use');
     }
 
+    // validate department exists if provided
+    if (dto.departmentId) {
+      const dept = await this.prisma.department.findUnique({
+        where: { id: dto.departmentId },
+      });
+      if (!dept) throw new BadRequestException('Department not found');
+    }
+
     const hash = await bcrypt.hash(dto.password, 10);
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        passwordHash: hash,
-        role: dto.role ?? 'FACULTY',
-      },
+
+    // create user + faculty profile in a transaction
+    const user = await this.prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          email: dto.email,
+          passwordHash: hash,
+          role: dto.role ?? 'FACULTY',
+        },
+      });
+
+      // only create Faculty row for FACULTY role
+      if ((dto.role ?? 'FACULTY') === 'FACULTY') {
+        await tx.faculty.create({
+          data: {
+            userId: newUser.id,
+            name: dto.name,
+            departmentId: dto.departmentId ?? 1, // fallback to first dept
+          },
+        });
+      }
+
+      return newUser;
     });
 
     const payload = { sub: user.id, email: user.email, role: user.role };
@@ -54,4 +85,3 @@ export class AuthService {
     };
   }
 }
-
