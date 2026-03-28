@@ -29,10 +29,9 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
-  // example protected route
+  @Get('me')
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  async me(@Request() req) {
+    return this.authService.me(req.user.userId);
   }
 }

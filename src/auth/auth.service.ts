@@ -84,4 +84,28 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
+
+  async me(userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        faculty: {
+          select: {
+            id: true,
+            name: true,
+            designation: true,
+            department: { select: { id: true, name: true, code: true } },
+          },
+        },
+      },
+    });
+
+    if (!user) throw new UnauthorizedException('User not found');
+    return user;
+  }
 }
