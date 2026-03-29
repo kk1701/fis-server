@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { AccountStatus } from '@prisma/client';
 import { Parser } from 'json2csv';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { CreateDepartmentDto } from '../departments/dto/create-department.dto';
+import { UpdateDepartmentDto } from '../departments/dto/update-department.dto';
+import { CreateCourseDto } from '../courses/dto/create-course.dto';
+import { UpdateCourseDto } from '../courses/dto/update-course.dto';
 
 @Injectable()
 export class AdminService {
@@ -17,9 +21,15 @@ export class AdminService {
       totalDepartments,
     ] = await this.prisma.$transaction([
       this.prisma.user.count({ where: { role: 'FACULTY', deletedAt: null } }),
-      this.prisma.user.count({ where: { role: 'FACULTY', status: 'APPROVED', deletedAt: null } }),
-      this.prisma.user.count({ where: { role: 'FACULTY', status: 'PENDING', deletedAt: null } }),
-      this.prisma.user.count({ where: { role: 'FACULTY', status: 'REJECTED', deletedAt: null } }),
+      this.prisma.user.count({
+        where: { role: 'FACULTY', status: 'APPROVED', deletedAt: null },
+      }),
+      this.prisma.user.count({
+        where: { role: 'FACULTY', status: 'PENDING', deletedAt: null },
+      }),
+      this.prisma.user.count({
+        where: { role: 'FACULTY', status: 'REJECTED', deletedAt: null },
+      }),
       this.prisma.courseCatalog.count(),
       this.prisma.department.count(),
     ]);
@@ -153,14 +163,148 @@ export class AdminService {
 
     const parser = new Parser({
       fields: [
-        'userId', 'name', 'email', 'status', 'designation',
-        'mobile', 'highestQualification', 'experienceYears',
-        'joiningDate', 'department', 'departmentCode',
-        'totalPublications', 'totalExperiences', 'totalCoursesTaught',
-        'registeredAt', 'approvedAt',
+        'userId',
+        'name',
+        'email',
+        'status',
+        'designation',
+        'mobile',
+        'highestQualification',
+        'experienceYears',
+        'joiningDate',
+        'department',
+        'departmentCode',
+        'totalPublications',
+        'totalExperiences',
+        'totalCoursesTaught',
+        'registeredAt',
+        'approvedAt',
       ],
     });
 
     return parser.parse(rows);
+  }
+
+  // ── Departments ──────────────────────────────────────────
+
+  async getDepartments() {
+    return this.prisma.department.findMany({
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        _count: {
+          select: { faculty: true, courseCatalog: true },
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async createDepartment(dto: CreateDepartmentDto) {
+    const existing = await this.prisma.department.findFirst({
+      where: { OR: [{ name: dto.name }, { code: dto.code }] },
+    });
+    if (existing) {
+      throw new ConflictException(
+        'Department with this name or code already exists',
+      );
+    }
+    return this.prisma.department.create({ data: dto });
+  }
+
+  async updateDepartment(id: number, dto: UpdateDepartmentDto) {
+    const dept = await this.prisma.department.findUnique({ where: { id } });
+    if (!dept) throw new NotFoundException('Department not found');
+    return this.prisma.department.update({ where: { id }, data: dto });
+  }
+
+  async deleteDepartment(id: number) {
+    const dept = await this.prisma.department.findUnique({
+      where: { id },
+      include: { faculty: true },
+    });
+    if (!dept) throw new NotFoundException('Department not found');
+    if (dept.faculty.length > 0) {
+      throw new ConflictException(
+        `Cannot delete — ${dept.faculty.length} faculty member(s) assigned to this department`,
+      );
+    }
+    await this.prisma.department.delete({ where: { id } });
+    return { message: 'Department deleted successfully' };
+  }
+
+  // ── Courses ──────────────────────────────────────────────
+
+  async getCourses(departmentId?: number, level?: string) {
+    return this.prisma.courseCatalog.findMany({
+      where: {
+        ...(departmentId && { departmentId }),
+        ...(level && { level: level as any }),
+      },
+      include: {
+        department: { select: { id: true, name: true, code: true } },
+        _count: { select: { coursesTaught: true } },
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async createCourse(dto: CreateCourseDto) {
+    const dept = await this.prisma.department.findUnique({
+      where: { id: dto.departmentId },
+    });
+    if (!dept) throw new NotFoundException('Department not found');
+
+    const existing = await this.prisma.courseCatalog.findUnique({
+      where: { code: dto.code },
+    });
+    if (existing) throw new ConflictException('Course code already exists');
+
+    return this.prisma.courseCatalog.create({
+      data: {
+        name: dto.name,
+        code: dto.code,
+        departmentId: dto.departmentId,
+        level: dto.courseLevel,
+        credits: dto.credits,
+      },
+      include: { department: true },
+    });
+  }
+
+  async updateCourse(
+    id: number,
+    dto: UpdateCourseDto
+  ) {
+    const course = await this.prisma.courseCatalog.findUnique({
+      where: { id },
+    });
+    if (!course) throw new NotFoundException('Course not found');
+
+    return this.prisma.courseCatalog.update({
+      where: { id },
+      data: {
+        ...(dto.name && { name: dto.name }),
+        ...(dto.credits && { credits: dto.credits }),
+        ...(dto.courseLevel && { level: dto.courseLevel }),
+      },
+      include: { department: true },
+    });
+  }
+
+  async deleteCourse(id: number) {
+    const course = await this.prisma.courseCatalog.findUnique({
+      where: { id },
+      include: { coursesTaught: true },
+    });
+    if (!course) throw new NotFoundException('Course not found');
+    if (course.coursesTaught.length > 0) {
+      throw new ConflictException(
+        `Cannot delete — ${course.coursesTaught.length} faculty course record(s) linked`,
+      );
+    }
+    await this.prisma.courseCatalog.delete({ where: { id } });
+    return { message: 'Course deleted successfully' };
   }
 }
