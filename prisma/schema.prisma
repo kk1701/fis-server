@@ -94,6 +94,7 @@ model Employment {
 model Degree {
   id             Int     @id @default(autoincrement())
   degreeName     String
+  level          DegreeLevel
   specialization String
   institute      String
   yearOfPassing  Int
@@ -242,4 +243,14 @@ enum AccountStatus {
   APPROVED
   REJECTED
   SUSPENDED
+}
+
+enum DegreeLevel {
+  TENTH
+  TWELFTH
+  DIPLOMA
+  GRADUATION
+  POST_GRADUATION
+  DOCTORATE
+  OTHER
 }
