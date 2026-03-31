@@ -18,18 +18,19 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('faculty')
-@UseGuards(JwtAuthGuard)
 export class FacultyProfileController {
   constructor(private readonly service: FacultyProfileService) {}
 
   // faculty: get own profile
   @Get('profile')
+  @UseGuards(JwtAuthGuard)
   getOwnProfile(@Request() req) {
     return this.service.getOwnProfile(req.user.userId);
   }
 
   // admin: get any faculty profile by facultyId
   @Get(':id/profile')
+  @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
   getProfileById(@Param('id', ParseIntPipe) id: number) {
@@ -38,6 +39,7 @@ export class FacultyProfileController {
 
   // faculty: update personal fields
   @Patch('profile/personal')
+  @UseGuards(JwtAuthGuard)
   @UseGuards(ApprovedGuard)
   updatePersonal(@Request() req, @Body() dto: UpdatePersonalDto) {
     return this.service.updatePersonal(req.user.userId, dto);
@@ -45,6 +47,7 @@ export class FacultyProfileController {
 
   // faculty: update academic fields
   @Patch('profile/academic')
+  @UseGuards(JwtAuthGuard)
   @UseGuards(ApprovedGuard)
   updateAcademic(@Request() req, @Body() dto: UpdateAcademicDto) {
     return this.service.updateAcademic(req.user.userId, dto);
@@ -52,6 +55,7 @@ export class FacultyProfileController {
 
   // admin: update any faculty profile
   @Patch(':id/profile')
+  @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
   adminUpdate(
