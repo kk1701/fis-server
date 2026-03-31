@@ -275,7 +275,7 @@ export class AdminService {
 
   async updateCourse(
     id: number,
-    dto: UpdateCourseDto
+    dto: UpdateCourseDto 
   ) {
     const course = await this.prisma.courseCatalog.findUnique({
       where: { id },
