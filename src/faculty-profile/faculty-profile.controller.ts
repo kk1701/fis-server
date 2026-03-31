@@ -1,6 +1,13 @@
 import {
-  Controller, Get, Patch, Body, Param, ParseIntPipe,
-  UseGuards, Request
+  Controller,
+  Get,
+  Patch,
+  Body,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Request,
+  Query,
 } from '@nestjs/common';
 import { FacultyProfileService } from './faculty-profile.service';
 import { UpdatePersonalDto } from './dto/update-personal.dto';
@@ -52,5 +59,29 @@ export class FacultyProfileController {
     @Body() dto: UpdatePersonalDto & UpdateAcademicDto,
   ) {
     return this.service.adminUpdateProfile(id, dto);
+  }
+
+  // public: paginated faculty directory
+  @Get('directory')
+  getDirectory(
+    @Query('departmentId') departmentId?: string,
+    @Query('search') search?: string,
+    @Query('specialization') specialization?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.service.getDirectory({
+      departmentId: departmentId ? parseInt(departmentId) : undefined,
+      search,
+      specialization,
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 12,
+    });
+  }
+
+  // public: single faculty public profile
+  @Get(':id/public')
+  getPublicProfile(@Param('id', ParseIntPipe) id: number) {
+    return this.service.getPublicProfile(id);
   }
 }
