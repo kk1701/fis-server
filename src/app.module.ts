@@ -14,9 +14,10 @@ import { ApprovalsModule } from './approvals/approvals.module';
 import { AdminModule } from './admin/admin.module';
 import { FacultyEducationModule } from './faculty-education/faculty-education.module';
 import { FacultySupervisionModule } from './faculty-supervision/faculty-supervision.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, FacultyProfileModule, UsersModule, DepartmentsModule, CoursesModule, FacultyCoursesModule, FacultyExperiencesModule, FacultyPublicationsModule, ApprovalsModule, AdminModule, FacultyEducationModule, FacultySupervisionModule],
+  imports: [ConfigModule.forRoot(), AuthModule, FacultyProfileModule, UsersModule, DepartmentsModule, CoursesModule, FacultyCoursesModule, FacultyExperiencesModule, FacultyPublicationsModule, ApprovalsModule, AdminModule, FacultyEducationModule, FacultySupervisionModule, AnalyticsModule],
   controllers: [AppController],
   providers: [AppService],
 })
