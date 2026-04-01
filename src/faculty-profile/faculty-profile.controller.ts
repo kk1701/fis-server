@@ -23,6 +23,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 
 @Controller('faculty')
 export class FacultyProfileController {
@@ -115,14 +116,14 @@ export class FacultyProfileController {
 
   @Post('profile/picture')
   @UseGuards(JwtAuthGuard, ApprovedGuard)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   async uploadProfilePicture(
     @Request() req,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) throw new BadRequestException('No file uploaded');
     const faculty = await this.service.getOwnProfile(req.user.userId);
-    const url = await this.cloudinaryService.uploadProfilePicture(
+    const url = await this.cloudinaryService.uploadProfilePictureToCloud(
       file,
       faculty.id,
     );

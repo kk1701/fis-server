@@ -4,7 +4,7 @@ import { Readable } from 'stream';
 
 @Injectable()
 export class CloudinaryService {
-  async uploadProfilePicture(
+  async uploadProfilePictureToCloud(
     file: Express.Multer.File,
     facultyId: number,
   ): Promise<string> {
@@ -32,7 +32,10 @@ export class CloudinaryService {
           ],
         },
         (error, result) => {
-          if (error) return reject(new BadRequestException('Upload failed'));
+          if (error) {
+            // console.log("error: ", error.message);
+            return reject(new BadRequestException('Upload failed'));
+          }
           resolve(result!.secure_url);
         },
       );
