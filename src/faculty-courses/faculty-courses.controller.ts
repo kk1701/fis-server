@@ -12,20 +12,19 @@ import { ApprovedGuard } from '../faculty-profile/guards/approved.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('faculty')
-@UseGuards(JwtAuthGuard)
 export class FacultyCoursesController {
   constructor(private readonly service: FacultyCoursesService) {}
 
   // faculty: add a course record
   @Post('courses')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   create(@Request() req, @Body() dto: CreateFacultyCourseDto) {
     return this.service.create(req.user.userId, dto);
   }
 
   // faculty: list own course records
   @Get('courses')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   findOwn(
     @Request() req,
     @Query('semester') semester?: string,
@@ -46,7 +45,7 @@ export class FacultyCoursesController {
 
   // faculty: update own course record
   @Patch('courses/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   update(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
@@ -57,7 +56,7 @@ export class FacultyCoursesController {
 
   // faculty or admin: delete course record
   @Delete('courses/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   remove(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,

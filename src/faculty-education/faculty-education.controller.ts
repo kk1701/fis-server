@@ -9,18 +9,17 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApprovedGuard } from '../faculty-profile/guards/approved.guard';
 
 @Controller('faculty')
-@UseGuards(JwtAuthGuard)
 export class FacultyEducationController {
   constructor(private readonly service: FacultyEducationService) {}
 
   @Post('education')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   create(@Request() req, @Body() dto: CreateDegreeDto) {
     return this.service.create(req.user.userId, dto);
   }
 
   @Get('education')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   findOwn(@Request() req) {
     return this.service.findOwn(req.user.userId);
   }
@@ -31,7 +30,7 @@ export class FacultyEducationController {
   }
 
   @Patch('education/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   update(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
@@ -41,7 +40,7 @@ export class FacultyEducationController {
   }
 
   @Delete('education/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   remove(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,

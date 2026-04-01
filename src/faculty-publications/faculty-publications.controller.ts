@@ -11,20 +11,19 @@ import { ApprovedGuard } from '../faculty-profile/guards/approved.guard';
 import { PublicationCategory } from '@prisma/client';
 
 @Controller('faculty')
-@UseGuards(JwtAuthGuard)
 export class FacultyPublicationsController {
   constructor(private readonly service: FacultyPublicationsService) {}
 
   // faculty: add a publication
   @Post('publications')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   create(@Request() req, @Body() dto: CreatePublicationDto) {
     return this.service.create(req.user.userId, dto);
   }
 
   // faculty: list own publications grouped by type
   @Get('publications')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   findOwn(
     @Request() req,
     @Query('type') type?: PublicationCategory,
@@ -43,7 +42,7 @@ export class FacultyPublicationsController {
 
   // faculty: update own publication
   @Patch('publications/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   update(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
@@ -54,7 +53,7 @@ export class FacultyPublicationsController {
 
   // faculty or admin: delete publication
   @Delete('publications/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   remove(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,

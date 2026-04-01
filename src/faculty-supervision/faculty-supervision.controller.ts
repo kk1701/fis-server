@@ -19,31 +19,31 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApprovedGuard } from '../faculty-profile/guards/approved.guard';
 
 @Controller('faculty')
-@UseGuards(JwtAuthGuard)
 export class FacultySupervisionController {
   constructor(private readonly service: FacultySupervisionService) {}
 
   // ── Thesis ────────────────────────────────────────────
 
   @Post('thesis')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   createThesis(@Request() req, @Body() dto: CreateThesisDto) {
     return this.service.createThesis(req.user.userId, dto);
   }
 
   @Get('thesis')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   findOwnTheses(@Request() req) {
     return this.service.findOwnTheses(req.user.userId);
   }
 
   @Get(':id/thesis')
+  @UseGuards(JwtAuthGuard)
   findThesesByFacultyId(@Param('id', ParseIntPipe) id: number) {
     return this.service.findThesesByFacultyId(id);
   }
 
   @Patch('thesis/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   updateThesis(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
@@ -53,7 +53,7 @@ export class FacultySupervisionController {
   }
 
   @Delete('thesis/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   removeThesis(@Request() req, @Param('id', ParseIntPipe) id: number) {
     return this.service.removeThesis(req.user.userId, id, req.user.role);
   }
@@ -61,24 +61,25 @@ export class FacultySupervisionController {
   // ── Dissertation ──────────────────────────────────────
 
   @Post('dissertation')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   createDissertation(@Request() req, @Body() dto: CreateDissertationDto) {
     return this.service.createDissertation(req.user.userId, dto);
   }
 
   @Get('dissertation')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   findOwnDissertations(@Request() req) {
     return this.service.findOwnDissertations(req.user.userId);
   }
 
   @Get(':id/dissertation')
+  @UseGuards(JwtAuthGuard)
   findDissertationsByFacultyId(@Param('id', ParseIntPipe) id: number) {
     return this.service.findDissertationsByFacultyId(id);
   }
 
   @Patch('dissertation/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   updateDissertation(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
@@ -93,7 +94,7 @@ export class FacultySupervisionController {
   }
 
   @Delete('dissertation/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   removeDissertation(@Request() req, @Param('id', ParseIntPipe) id: number) {
     return this.service.removeDissertation(req.user.userId, id, req.user.role);
   }

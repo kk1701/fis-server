@@ -11,20 +11,19 @@ import { ApprovedGuard } from '../faculty-profile/guards/approved.guard';
 import { ExperienceType } from '@prisma/client';
 
 @Controller('faculty')
-@UseGuards(JwtAuthGuard)
 export class FacultyExperiencesController {
   constructor(private readonly service: FacultyExperiencesService) {}
 
   // faculty: add experience entry
   @Post('experiences')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   create(@Request() req, @Body() dto: CreateExperienceDto) {
     return this.service.create(req.user.userId, dto);
   }
 
   // faculty: list own experiences grouped by type
   @Get('experiences')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   findOwn(
     @Request() req,
     @Query('type') type?: ExperienceType,
@@ -43,7 +42,7 @@ export class FacultyExperiencesController {
 
   // faculty: update own experience entry
   @Patch('experiences/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   update(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
@@ -54,7 +53,7 @@ export class FacultyExperiencesController {
 
   // faculty or admin: delete experience entry
   @Delete('experiences/:id')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   remove(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
