@@ -22,42 +22,33 @@ import { Roles } from '../auth/decorators/roles.decorator';
 export class FacultyProfileController {
   constructor(private readonly service: FacultyProfileService) {}
 
-  // faculty: get own profile
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   getOwnProfile(@Request() req) {
     return this.service.getOwnProfile(req.user.userId);
   }
 
-  // admin: get any faculty profile by facultyId
   @Get(':id/profile')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   getProfileById(@Param('id', ParseIntPipe) id: number) {
     return this.service.getProfileById(id);
   }
 
-  // faculty: update personal fields
   @Patch('profile/personal')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   updatePersonal(@Request() req, @Body() dto: UpdatePersonalDto) {
     return this.service.updatePersonal(req.user.userId, dto);
   }
 
-  // faculty: update academic fields
   @Patch('profile/academic')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   updateAcademic(@Request() req, @Body() dto: UpdateAcademicDto) {
     return this.service.updateAcademic(req.user.userId, dto);
   }
 
-  // admin: update any faculty profile
   @Patch(':id/profile')
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   adminUpdate(
     @Param('id', ParseIntPipe) id: number,
@@ -66,7 +57,6 @@ export class FacultyProfileController {
     return this.service.adminUpdateProfile(id, dto);
   }
 
-  // public: paginated faculty directory
   @Get('directory')
   getDirectory(
     @Query('departmentId') departmentId?: string,
@@ -84,22 +74,19 @@ export class FacultyProfileController {
     });
   }
 
-  // public: single faculty public profile
   @Get(':id/public')
   getPublicProfile(@Param('id', ParseIntPipe) id: number) {
     return this.service.getPublicProfile(id);
   }
 
-  // faculty: get own addresses
   @Get('addresses')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   getAddresses(@Request() req) {
     return this.service.getAddresses(req.user.userId);
   }
 
-  // faculty: upsert address by type
   @Patch('addresses')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   upsertAddress(
     @Request() req,
     @Query('type') type: 'CORRESPONDENCE' | 'PERMANENT',
@@ -108,9 +95,8 @@ export class FacultyProfileController {
     return this.service.upsertAddress(req.user.userId, type, dto);
   }
 
-  // faculty: delete address by type
   @Delete('addresses')
-  @UseGuards(ApprovedGuard)
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
   deleteAddress(
     @Request() req,
     @Query('type') type: 'CORRESPONDENCE' | 'PERMANENT',
