@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { FacultyProfileService } from './faculty-profile.service';
 import { UpdatePersonalDto } from './dto/update-personal.dto';
@@ -87,5 +88,33 @@ export class FacultyProfileController {
   @Get(':id/public')
   getPublicProfile(@Param('id', ParseIntPipe) id: number) {
     return this.service.getPublicProfile(id);
+  }
+
+  // faculty: get own addresses
+  @Get('addresses')
+  @UseGuards(ApprovedGuard)
+  getAddresses(@Request() req) {
+    return this.service.getAddresses(req.user.userId);
+  }
+
+  // faculty: upsert address by type
+  @Patch('addresses')
+  @UseGuards(ApprovedGuard)
+  upsertAddress(
+    @Request() req,
+    @Query('type') type: 'CORRESPONDENCE' | 'PERMANENT',
+    @Body() dto: any,
+  ) {
+    return this.service.upsertAddress(req.user.userId, type, dto);
+  }
+
+  // faculty: delete address by type
+  @Delete('addresses')
+  @UseGuards(ApprovedGuard)
+  deleteAddress(
+    @Request() req,
+    @Query('type') type: 'CORRESPONDENCE' | 'PERMANENT',
+  ) {
+    return this.service.deleteAddress(req.user.userId, type);
   }
 }

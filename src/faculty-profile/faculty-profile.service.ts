@@ -248,4 +248,60 @@ export class FacultyProfileService {
 
     return faculty;
   }
+
+  async getAddresses(userId: number) {
+    const faculty = await this.prisma.faculty.findUnique({
+      where: { id: userId },
+    });
+
+    if (!faculty) throw new NotFoundException('Faculty not found');
+
+    return this.prisma.address.findMany({
+      where: { facultyId: faculty?.id },
+    });
+  }
+
+  async upsertAddress(
+    userId: number,
+    type: 'CORRESPONDENCE' | 'PERMANENT',
+    dto: any,
+  ) {
+    const faculty = await this.prisma.faculty.findUnique({
+      where: { id: userId },
+    });
+
+    if (!faculty) throw new NotFoundException('Faculty not found');
+
+    return this.prisma.address.upsert({
+      where: {
+        facultyId_type: {
+          facultyId: faculty?.id,
+          type,
+        },
+      },
+      update: { ...dto },
+      create: {
+        facultyId: faculty.id,
+        type,
+        ...dto,
+      },
+    });
+  }
+
+  async deleteAddress(userId: number, type: 'CORRESPONDENCE' | 'PERMANENT') {
+    const faculty = await this.prisma.faculty.findUnique({
+      where: { id: userId },
+    });
+
+    if (!faculty) throw new NotFoundException('Faculty not found');
+
+    const address = await this.prisma.address.findUnique({
+      where: { facultyId_type: { facultyId: faculty?.id, type } },
+    });
+    if (!address) throw new NotFoundException('Address not found');
+    await this.prisma.address.delete({
+      where: { facultyId_type: { facultyId: faculty?.id, type } },
+    });
+    return { message: 'Address deleted successfully' };
+  }
 }
