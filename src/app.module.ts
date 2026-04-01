@@ -15,9 +15,26 @@ import { AdminModule } from './admin/admin.module';
 import { FacultyEducationModule } from './faculty-education/faculty-education.module';
 import { FacultySupervisionModule } from './faculty-supervision/faculty-supervision.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, FacultyProfileModule, UsersModule, DepartmentsModule, CoursesModule, FacultyCoursesModule, FacultyExperiencesModule, FacultyPublicationsModule, ApprovalsModule, AdminModule, FacultyEducationModule, FacultySupervisionModule, AnalyticsModule],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    FacultyProfileModule,
+    UsersModule,
+    DepartmentsModule,
+    CoursesModule,
+    FacultyCoursesModule,
+    FacultyExperiencesModule,
+    FacultyPublicationsModule,
+    ApprovalsModule,
+    AdminModule,
+    FacultyEducationModule,
+    FacultySupervisionModule,
+    AnalyticsModule,
+    CloudinaryModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -296,4 +296,13 @@ export class FacultyProfileService {
     });
     return { message: 'Address deleted successfully' };
   }
+
+  async uploadProfilePicture(userId: number, photoUrl: string) {
+  const faculty = await this.resolveFaculty(userId);
+  return this.prisma.faculty.update({
+    where: { id: faculty.id },
+    data: { photoUrl },
+    select: { id: true, photoUrl: true },
+  });
+}
 }

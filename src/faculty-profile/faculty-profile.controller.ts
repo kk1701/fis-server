@@ -9,6 +9,10 @@ import {
   Request,
   Query,
   Delete,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { FacultyProfileService } from './faculty-profile.service';
 import { UpdatePersonalDto } from './dto/update-personal.dto';
@@ -17,10 +21,15 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApprovedGuard } from './guards/approved.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('faculty')
 export class FacultyProfileController {
-  constructor(private readonly service: FacultyProfileService) {}
+  constructor(
+    private readonly service: FacultyProfileService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
@@ -102,5 +111,21 @@ export class FacultyProfileController {
     @Query('type') type: 'CORRESPONDENCE' | 'PERMANENT',
   ) {
     return this.service.deleteAddress(req.user.userId, type);
+  }
+
+  @Post('profile/picture')
+  @UseGuards(JwtAuthGuard, ApprovedGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfilePicture(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) throw new BadRequestException('No file uploaded');
+    const faculty = await this.service.getOwnProfile(req.user.userId);
+    const url = await this.cloudinaryService.uploadProfilePicture(
+      file,
+      faculty.id,
+    );
+    return this.service.uploadProfilePicture(req.user.userId, url);
   }
 }
