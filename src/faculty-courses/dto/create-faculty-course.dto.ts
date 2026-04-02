@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { IsInt, IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
 
 export enum CourseRole {
@@ -12,6 +13,7 @@ export enum CourseMode {
 }
 
 export class CreateFacultyCourseDto {
+  @Type(() => Number)
   @IsInt()
   courseId: number;
 
