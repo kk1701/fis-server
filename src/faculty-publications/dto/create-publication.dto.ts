@@ -1,6 +1,7 @@
 import {
   IsString, IsNotEmpty, IsOptional,
-  IsEnum, IsInt, IsArray, IsUrl, Min
+  IsEnum, IsInt, IsArray, IsUrl, Min,
+  isString
 } from 'class-validator';
 import { PublicationCategory } from '@prisma/client';
 
@@ -29,8 +30,11 @@ export class CreatePublicationDto {
   @IsOptional() @IsString()
   pages?: string;
 
-  @IsString()
-  publisher: string;
+  @IsOptional() @IsString()
+  publisher?: string;
+
+  @IsOptional() @IsString()
+  indexing?: string;
 
   @IsOptional() @IsString()
   citation?: string;
