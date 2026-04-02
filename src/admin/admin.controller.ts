@@ -18,7 +18,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AccountStatus } from '@prisma/client';
-import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CreateDepartmentDto } from '../departments/dto/create-department.dto';
 import { UpdateDepartmentDto } from '../departments/dto/update-department.dto';
 import { CreateCourseDto } from '../courses/dto/create-course.dto';
@@ -133,4 +132,5 @@ export class AdminController {
   ) {
     return this.service.resetFacultyPassword(userId, body.newPassword);
   }
+
 }
