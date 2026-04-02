@@ -196,6 +196,17 @@ model DissertationSupervision {
   faculty        Faculty @relation(fields: [facultyId], references: [id])
 }
 
+model OTP {
+  id        Int      @id @default(autoincrement())
+  email     String
+  otpHash   String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
 enum Gender {
   MALE
   FEMALE

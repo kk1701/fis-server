@@ -16,6 +16,7 @@ import { FacultyEducationModule } from './faculty-education/faculty-education.mo
 import { FacultySupervisionModule } from './faculty-supervision/faculty-supervision.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     FacultySupervisionModule,
     AnalyticsModule,
     CloudinaryModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

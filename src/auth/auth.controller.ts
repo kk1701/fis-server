@@ -34,4 +34,28 @@ export class AuthController {
   async me(@Request() req) {
     return this.authService.me(req.user.userId);
   }
+
+  @Post('forgot-password')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async forgotPassword(@Body() body: { email: string }) {
+    return this.authService.forgotPassword(body.email);
+  }
+
+  @Post('verify-otp')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async verifyOTP(@Body() body: { email: string; otp: string }) {
+    return this.authService.verifyOTP(body.email, body.otp);
+  }
+
+  @Post('reset-password')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async resetPassword(
+    @Body() body: { email: string; resetToken: string; newPassword: string },
+  ) {
+    return this.authService.resetPassword(
+      body.email,
+      body.resetToken,
+      body.newPassword,
+    );
+  }
 }
