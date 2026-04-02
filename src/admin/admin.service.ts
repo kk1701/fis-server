@@ -1,7 +1,12 @@
 import { PrismaService } from '../prisma.service';
 import { AccountStatus } from '@prisma/client';
 import { Parser } from 'json2csv';
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { CreateDepartmentDto } from '../departments/dto/create-department.dto';
 import { UpdateDepartmentDto } from '../departments/dto/update-department.dto';
 import { CreateCourseDto } from '../courses/dto/create-course.dto';
@@ -273,10 +278,7 @@ export class AdminService {
     });
   }
 
-  async updateCourse(
-    id: number,
-    dto: UpdateCourseDto 
-  ) {
+  async updateCourse(id: number, dto: UpdateCourseDto) {
     const course = await this.prisma.courseCatalog.findUnique({
       where: { id },
     });
@@ -306,5 +308,17 @@ export class AdminService {
     }
     await this.prisma.courseCatalog.delete({ where: { id } });
     return { message: 'Course deleted successfully' };
+  }
+
+  async resetFacultyPassword(userId: number, newPassword: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.deletedAt) throw new NotFoundException('User not found');
+
+    const hash = await bcrypt.hash(newPassword, 10);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: hash },
+    });
+    return { message: 'Password reset successfully' };
   }
 }

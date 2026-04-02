@@ -125,4 +125,12 @@ export class AdminController {
   deleteCourse(@Param('id', ParseIntPipe) id: number) {
     return this.service.deleteCourse(id);
   }
+
+  @Patch('faculty/:userId/reset-password')
+  resetFacultyPassword(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() body: { newPassword: string },
+  ) {
+    return this.service.resetFacultyPassword(userId, body.newPassword);
+  }
 }
