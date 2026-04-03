@@ -20,6 +20,7 @@ model User {
   faculty      Faculty?
   approvedBy   User?         @relation("AdminApproval", fields: [approvedById], references: [id])
   approvals    User[]        @relation("AdminApproval")
+  publishedReports PublishedReport[] @relation("PublishedReports")
 }
 
 model Faculty {
@@ -205,6 +206,19 @@ model OTP {
   createdAt DateTime @default(now())
 
   @@index([email])
+}
+
+model PublishedReport {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String?
+  reportType    String
+  data          Json
+  isPublic      Boolean  @default(true)
+  publishedAt   DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  publishedById Int
+  publishedBy   User     @relation("PublishedReports", fields: [publishedById], references: [id])
 }
 
 enum Gender {
